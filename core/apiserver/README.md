@@ -74,6 +74,7 @@ cluster's shared state through which all other components interact.`,
 ```
 // ServerRunOptions runs a kubernetes api server.
 type ServerRunOptions struct {
+    //服务器通用的参数选项
     GenericServerRunOptions *genericoptions.ServerRunOptions
     Etcd                    *genericoptions.EtcdOptions
     SecureServing           *genericoptions.SecureServingOptionsWithLoopback
@@ -86,14 +87,20 @@ type ServerRunOptions struct {
     CloudProvider           *kubeoptions.CloudProviderOptions
     APIEnablement           *genericoptions.APIEnablementOptions
 
+    //是否允许pod中容器拥有超级权限
     AllowPrivileged           bool
     EnableLogsHandler         bool
+    //时间可以保存时间
     EventTTL                  time.Duration
+    //kubelet配置
     KubeletConfig             kubeletclient.KubeletClientConfig
+    //服务的节点端口
     KubernetesServiceNodePort int
     MaxConnectionBytesPerSec  int64
-    ServiceClusterIPRange     net.IPNet // TODO: make this a list
+    //服务集群IP范围，节点端口范围
+    ServiceClusterIPRange     net.IPNet
     ServiceNodePortRange      utilnet.PortRange
+    //如果设置，可以使用SSH用户名和私钥对Node访问
     SSHKeyfile                string
     SSHUser                   string
 
@@ -108,5 +115,31 @@ type ServerRunOptions struct {
     ServiceAccountSigningKeyFile     string
     ServiceAccountIssuer             serviceaccount.TokenGenerator
     ServiceAccountTokenMaxExpiration time.Duration
+}
+```
+#### GenericServerRunOptions *genericoptions.ServerRunOptions
+#### 路径：staging/src/k8s.io/apiserver/pkg/server/options/server_runoptions.go
+####      genericoptions "k8s.io/apiserver/pkg/server/options"
+```
+// ServerRunOptions contains the options while running a generic api server.
+type ServerRunOptions struct {
+    AdvertiseAddress net.IP
+
+    CorsAllowedOriginList       []string
+    ExternalHost                string
+    MaxRequestsInFlight         int
+    MaxMutatingRequestsInFlight int
+    RequestTimeout              time.Duration
+    MinRequestTimeout           int
+    // We intentionally did not add a flag for this option. Users of the
+    // apiserver library can wire it to a flag.
+    JSONPatchMaxCopyBytes int64
+    // The limit on the request body size that would be accepted and
+    // decoded in a write request. 0 means no limit.
+    // We intentionally did not add a flag for this option. Users of the
+    // apiserver library can wire it to a flag.
+    MaxRequestBodyBytes       int64
+    TargetRAMMB               int
+    EnableInfightQuotaHandler bool
 }
 ```
